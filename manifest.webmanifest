@@ -1,0 +1,15 @@
+{
+  "name": "Bank Guide",
+  "short_name": "Bank Guide",
+  "description": "Enter a BANK! dice game as it happens and get a bank-or-roll call from a neural network. Works offline.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#10131a",
+  "theme_color": "#10131a",
+  "icons": [
+    { "src": "icon-180.png", "sizes": "180x180", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

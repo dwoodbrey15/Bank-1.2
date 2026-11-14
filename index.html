@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Bank Guide</title>
+<meta name="theme-color" content="#10131a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Bank Guide">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-180.png">
+<style>
+:root{--bg:#10131a;--card:#191d26;--card2:#20252f;--line:#2c3340;--tx:#f3f5f9;--mut:#7d8597;--acc:#5ef0b0;--acc-d:#0f2a20;--red:#ff5d6c;--red-d:#2a1216}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);color:var(--tx);overscroll-behavior:none}
+/* touch-action is not inherited: set it on everything so fast repeated taps never become double-tap zoom or a scroll */
+*{touch-action:manipulation;-webkit-touch-callout:none}
+#app{touch-action:none}
+#app .setup{touch-action:pan-y}
+body{font:16px/1.3 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",system-ui,sans-serif;-webkit-user-select:none;user-select:none;touch-action:manipulation;
+ position:fixed;inset:0;display:flex;justify-content:center}
+#app{width:100%;max-width:460px;height:100%;display:flex;flex-direction:column;gap:12px;
+ padding:calc(env(safe-area-inset-top,0px) + 10px) calc(env(safe-area-inset-right,0px) + 16px) calc(env(safe-area-inset-bottom,0px) + 12px) calc(env(safe-area-inset-left,0px) + 16px)}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+.num{font-variant-numeric:tabular-nums;font-feature-settings:"tnum"}
+.mut{color:var(--mut)}
+.top{display:flex;align-items:center;justify-content:space-between;min-height:36px}
+.top .rd{font-size:15px;font-weight:600;letter-spacing:.02em}
+.top .rd span{color:var(--mut);font-weight:500}
+.pill{height:34px;padding:0 14px;border-radius:17px;background:var(--card);border:1px solid var(--line);font-size:14px;font-weight:600;display:inline-flex;align-items:center;gap:6px}
+.pill:disabled{opacity:.35}
+.pill.warn{border-color:var(--red);color:var(--red)}
+.pot{text-align:center;padding:2px 0 0}
+.pot .lab{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--mut)}
+.pot .val{font-size:64px;line-height:1.05;font-weight:700;letter-spacing:-.03em}
+.adv{border-radius:22px;padding:16px 18px;background:var(--card);border:1px solid var(--line);text-align:center;transition:background .2s,border-color .2s}
+.adv .big{font-size:34px;font-weight:800;letter-spacing:.04em;line-height:1.1}
+.adv .sub{font-size:14px;color:var(--mut);margin-top:6px}
+.adv .sub b{color:var(--tx);font-weight:600}
+.adv.bank{background:linear-gradient(180deg,#123526,#0c2019);border-color:#2b7a5b;box-shadow:0 0 40px -12px var(--acc)}
+.adv.bank .big{color:var(--acc)}
+.bar{height:4px;border-radius:2px;background:var(--line);margin-top:12px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--acc);border-radius:2px;transition:width .25s}
+.hint{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--mut);margin:2px 2px -4px}
+.players{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pl{display:flex;flex-direction:column;align-items:flex-start;gap:1px;text-align:left;padding:9px 12px;border-radius:16px;background:var(--card);border:1px solid var(--line);min-height:56px;position:relative;transition:transform .08s,opacity .2s}
+.pl:active{transform:scale(.97)}
+.pl .nm{font-size:13px;color:var(--mut);font-weight:600;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:44px}
+.pl .sc{font-size:20px;font-weight:700;letter-spacing:-.01em}
+.pl .tag{position:absolute;right:11px;top:10px;font-size:12px;color:var(--mut);font-weight:600}
+.pl.me{border-color:#3a4254}
+.pl.me .nm{color:var(--tx)}
+.pl.out{background:transparent;opacity:.62}
+.pl.out .tag{color:var(--acc)}
+.pl.lead .sc{color:var(--acc)}
+.grow{flex:1;min-height:0}
+.keys{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.k{height:54px;border-radius:16px;background:var(--card2);border:1px solid var(--line);font-size:22px;font-weight:650;display:flex;align-items:center;justify-content:center;gap:6px;transition:transform .08s,background .1s}
+.k:active{transform:scale(.95);background:#252b38}
+.k small{font-size:12px;color:var(--mut);font-weight:600}
+.k.w2{grid-column:span 2}
+.k.dbl{color:var(--acc);border-color:#235a45;background:var(--acc-d);font-size:18px}
+.k.sev{color:var(--red);border-color:#5d2530;background:var(--red-d)}
+.k.sev small{color:var(--red);opacity:.8}
+.dl{font-size:14px;font-weight:600;height:18px;margin:-4px 2px -4px;text-align:center}
+.dl b{color:var(--acc);font-weight:700}.dl b.sev{color:var(--red)}
+.dice{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+.die{aspect-ratio:1;border-radius:26%;background:var(--card2);border:1.5px solid var(--line);display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);padding:17%;place-items:center;transition:transform .08s,background .12s,border-color .12s,box-shadow .12s}
+.die:active{transform:scale(.92)}
+.die i{width:70%;aspect-ratio:1;border-radius:50%}
+.die i.p{background:#aab2c3}
+.die.on{border-color:var(--acc);background:var(--acc-d);box-shadow:0 0 22px -6px var(--acc)}
+.die.on i.p{background:var(--acc)}
+/* setup */
+.setup{display:flex;flex-direction:column;gap:18px;height:100%;overflow:auto;-webkit-overflow-scrolling:touch}
+.setup h1{font-size:40px;letter-spacing:-.03em;margin:18px 0 0;font-weight:800}
+.setup h1 em{font-style:normal;color:var(--acc)}
+.setup p{margin:0;color:var(--mut);font-size:15px}
+.sec{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--mut);margin-bottom:8px}
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:5px}
+.seg button{height:42px;border-radius:12px;font-weight:650;font-size:17px;color:var(--mut)}
+.seg button.on{background:var(--tx);color:#07080b}
+.names{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.names input{width:100%;height:46px;border-radius:14px;border:1px solid var(--line);background:var(--card);color:var(--tx);font:inherit;font-size:16px;padding:0 14px;outline:none;-webkit-user-select:text;user-select:text}
+.names input:focus{border-color:var(--acc)}
+.names input.me{border-color:#3a4254}
+.go{height:58px;border-radius:20px;background:var(--acc);color:#04130c;font-weight:800;font-size:18px;letter-spacing:.02em;margin-top:auto;flex:none}
+.go:active{transform:scale(.98)}
+.foot{font-size:12px;color:var(--mut);text-align:center}
+.final{display:flex;flex-direction:column;gap:8px}
+.final .row{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-radius:16px;background:var(--card);border:1px solid var(--line);font-weight:650}
+.final .row.win{border-color:#2b7a5b;background:linear-gradient(180deg,#123526,#0c2019)}
+.final .row.win .sc{color:var(--acc)}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script src="net.js"></script>
+<script>
+'use strict';
+const KEY = 'bank-guide-v1', $ = document.getElementById('app');
+let net = null, netErr = '', S = null, hist = [], setup = { n: 4, R: 10, names: [] }, confirmNew = false;
+
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+function fmt(x) {
+  if (x < 1e6) return Math.round(x).toLocaleString('en-US');
+  const u = [[1e30, 'e30'], [1e12, 'T'], [1e9, 'B'], [1e6, 'M']];
+  if (x >= 1e15) return x.toExponential(2).replace('+', '');
+  for (const [v, s] of u) if (x >= v) return (x / v).toFixed(x / v < 10 ? 2 : x / v < 100 ? 1 : 0) + s;
+}
+const pct = p => p < .005 ? '<1%' : p > .995 ? '>99%' : Math.round(p * 100) + '%';
+function rnd(seed, i) {      // fixed draw per decision point, so undo/redo never re-rolls the advice
+  let t = (seed ^ Math.imul(i + 1, 0x9E3779B1)) >>> 0;
+  t = Math.imul(t ^ t >>> 15, t | 1); t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+  return ((t ^ t >>> 14) >>> 0) / 4294967296;
+}
+function save() { try { localStorage.setItem(KEY, JSON.stringify({ S, hist: hist.slice(-500), setup })); } catch (e) {} }
+function load() { try { const d = JSON.parse(localStorage.getItem(KEY) || 'null'); if (d) { S = d.S; hist = d.hist || []; setup = d.setup || setup; } } catch (e) {} }
+
+function push() { hist.push(JSON.stringify(S)); }
+function newRound() { S.pot = 0; S.safe = 0; S.rolls = 0; S.active = S.score.map(() => true); S.got = S.score.map(() => 0); }
+function endRound() { if (S.round >= S.R) S.over = true; else { S.round++; newRound(); } }
+function roll(v) {
+  if (!S || S.over) return;
+  push();
+  if (S.rolls < 3) { S.pot += v === 7 ? 70 : v; S.rolls++; if (S.rolls === 3) S.safe = S.pot; }
+  else if (v === 7) endRound();
+  else { S.pot = v === 'D' ? Math.min(S.pot * 2, 1e30) : S.pot + v; S.rolls++; }
+  S.step++; render();
+}
+function bank(i) {
+  if (!S || S.over || S.rolls < 3 || !S.active[i]) return;
+  push();
+  S.score[i] += S.pot; S.got[i] = S.pot; S.active[i] = false;
+  if (!S.active.some(Boolean)) endRound();
+  S.step++; render();
+}
+function undo() { if (lock) return; pick = [0, 0]; if (hist.length) { S = JSON.parse(hist.pop()); confirmNew = false; render(); } }
+function start() {
+  const names = Array.from({ length: setup.n }, (_, i) => (setup.names[i] || '').trim() || (i ? 'Player ' + (i + 1) : 'You'));
+  S = { names, R: setup.R, round: 1, score: names.map(() => 0), over: false, seed: (Math.random() * 2 ** 32) >>> 0, step: 0 };
+  newRound(); hist = []; render();
+}
+function quit() { if (!confirmNew) { confirmNew = true; render(); setTimeout(() => { if (confirmNew) { confirmNew = false; render(); } }, 3000); return; } S = null; hist = []; confirmNew = false; render(); }
+
+let pick = [0, 0], lock = false;
+const PIPS = [[], [4], [0, 8], [0, 4, 8], [0, 2, 6, 8], [0, 2, 4, 6, 8], [0, 2, 3, 5, 6, 8]];
+function pickDie(k, v) {         // tap one face per die; the roll is entered as soon as both are chosen
+  if (lock || !S || S.over) return;
+  pick[k] = pick[k] === v ? 0 : v;
+  if (pick[0] && pick[1]) {
+    lock = true; render();
+    setTimeout(() => { const [a, b] = pick; pick = [0, 0]; lock = false; roll(a + b === 7 ? 7 : S.rolls >= 3 && a === b ? 'D' : a + b); }, 280);
+  } else render();
+}
+function advice() {
+  if (!S || S.over || S.rolls < 3 || !net) return null;
+  const r = net.advise({ pot: S.pot, safe: S.safe, round: S.round, R: S.R, rolls: S.rolls, score: S.score, active: S.active });
+  return { p: r.bank[0], win: r.win, bank: rnd(S.seed, S.step) < r.bank[0] };
+}
+
+function renderSetup() {
+  const seg = (vals, cur, fn) => `<div class="seg">${vals.map(v => `<button class="${v === cur ? 'on' : ''}" onclick="${fn}(${v})">${v}</button>`).join('')}</div>`;
+  $.innerHTML = `<div class="setup">
+   <div><h1>Bank<em>.</em></h1><p>Enter the game as it happens. The network tells you when to bank.</p></div>
+   <div><div class="sec">Players</div>${seg([3, 4, 5, 6, 7, 8], setup.n, 'setN')}</div>
+   <div><div class="sec">Rounds</div>${seg([10, 15, 20], setup.R, 'setR')}</div>
+   <div><div class="sec">Names · first seat is you</div><div class="names">${Array.from({ length: setup.n }, (_, i) =>
+    `<input class="${i ? '' : 'me'}" maxlength="14" autocomplete="off" autocapitalize="words" placeholder="${i ? 'Player ' + (i + 1) : 'You'}" value="${esc(setup.names[i] || '')}" oninput="setup.names[${i}]=this.value;save()">`).join('')}</div></div>
+   <button class="go" onclick="start()">Start game</button>
+   <div class="foot">${net ? 'Network ready · works offline' : netErr || 'Loading network…'}</div></div>`;
+}
+window.setN = v => { setup.n = v; render(); }; window.setR = v => { setup.R = v; render(); };
+
+function renderOver() {
+  const top = Math.max(...S.score), order = S.score.map((s, i) => i).sort((a, b) => S.score[b] - S.score[a]);
+  $.innerHTML = `<div class="top"><div class="rd">Final <span>· ${S.R} rounds</span></div><button class="pill" onclick="undo()">↩ Undo</button></div>
+   <div class="pot"><div class="lab">Winner</div><div class="val" style="font-size:44px">${top > 0 ? esc(order.filter(i => S.score[i] === top).map(i => S.names[i]).join(' & ')) : 'Nobody'}</div></div>
+   <div class="final">${order.map(i => `<div class="row ${S.score[i] === top && top > 0 ? 'win' : ''}"><span>${esc(S.names[i])}</span><span class="sc num">${fmt(S.score[i])}</span></div>`).join('')}</div>
+   <div class="grow"></div><button class="go" onclick="S=null;hist=[];render()">New game</button>`;
+}
+
+function render() {
+  save();
+  if (!S) return renderSetup();
+  if (S.over) return renderOver();
+  const a = advice(), safe = S.rolls < 3, me = S.active[0], top = Math.max(...S.score);
+  let adv;
+  if (safe) adv = `<div class="adv"><div class="big" style="font-size:26px">Safe rolls</div><div class="sub">Roll <b>${S.rolls + 1} of 3</b> · nobody can bank yet</div></div>`;
+  else if (!me) adv = `<div class="adv"><div class="big" style="font-size:26px">You banked</div><div class="sub">In for <b class="num">${fmt(S.got[0])}</b> this round${a ? ` · win chance <b>${pct(a.win[0])}</b>` : ''}</div></div>`;
+  else if (!a) adv = `<div class="adv"><div class="big" style="font-size:26px">…</div><div class="sub">${netErr || 'Loading network…'}</div></div>`;
+  else adv = `<div class="adv ${a.bank ? 'bank' : ''}"><div class="big">${a.bank ? 'BANK' : 'ROLL'}</div>
+     <div class="sub">Bank chance <b>${pct(a.p)}</b> · win chance <b>${pct(a.win[0])}</b></div><div class="bar"><i style="width:${Math.max(1, a.p * 100)}%"></i></div></div>`;
+  const tiles = S.names.map((nm, i) => {
+    const out = !S.active[i];
+    const tag = out ? '✓ ' + fmt(S.got[i]) : a ? pct(a.win[i]) : '';
+    return `<button class="pl ${i ? '' : 'me'} ${out ? 'out' : ''} ${S.score[i] === top && top > 0 ? 'lead' : ''}" onclick="bank(${i})"><span class="nm">${esc(nm)}</span><span class="sc num">${fmt(S.score[i])}</span><span class="tag num">${tag}</span></button>`;
+  }).join('');
+  const [d1, d2] = pick, sum = d1 + d2, both = d1 && d2;
+  const what = !both ? '' : safe ? (sum === 7 ? '<b>7 counts as 70</b>' : `<b>+${sum}</b>`)
+    : sum === 7 ? '<b class="sev">Seven · round over</b>' : d1 === d2 ? '<b>Doubles · pot ×2</b>' : `<b>+${sum}</b>`;
+  const dieRow = k => `<div class="dice">${[1, 2, 3, 4, 5, 6].map(v =>
+    `<button class="die ${pick[k] === v ? 'on' : ''}" aria-label="Die ${k + 1}: ${v}" onclick="pickDie(${k},${v})">${Array.from({ length: 9 }, (_, i) => `<i class="${PIPS[v].includes(i) ? 'p' : ''}"></i>`).join('')}</button>`).join('')}</div>`;
+  $.innerHTML = `<div class="top"><div class="rd">Round ${S.round} <span>of ${S.R}</span></div>
+     <div style="display:flex;gap:8px"><button class="pill ${confirmNew ? 'warn' : ''}" onclick="quit()">${confirmNew ? 'Tap to end game' : 'New'}</button><button class="pill" ${hist.length ? '' : 'disabled'} onclick="undo()">↩ Undo</button></div></div>
+   <div class="pot"><div class="lab">Pot</div><div class="val num" style="font-size:${S.pot >= 1e9 ? 44 : S.pot >= 1e5 ? 54 : 64}px">${fmt(S.pot)}</div></div>
+   ${adv}
+   <div class="hint">${safe ? 'Scores' : 'Tap a player when they bank'}</div>
+   <div class="players">${tiles}</div>
+   <div class="grow"></div>
+   <div class="dl">${what}</div>
+   ${dieRow(0)}${dieRow(1)}`;
+}
+
+load(); render();
+(async () => {
+  try {
+    const [meta, buf] = await Promise.all([fetch('model.json').then(r => r.json()), fetch('model.bin').then(r => r.arrayBuffer())]);
+    net = new BankNet.Net(meta, buf);
+  } catch (e) { netErr = 'Network failed to load'; }
+  render();
+})();
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+// Belt and braces for iOS: block double-tap zoom and pinch, and snap the page back if it ever shifts.
+['dblclick', 'gesturestart', 'gesturechange', 'gestureend'].forEach(t => document.addEventListener(t, e => e.preventDefault(), { passive: false }));
+let lastTouch = 0;
+document.addEventListener('touchend', e => { const now = Date.now(); if (now - lastTouch < 350 && !e.target.closest('input')) { e.preventDefault(); e.target.closest('button')?.click(); } lastTouch = now; }, { passive: false });
+const pin = () => { if (window.scrollX || window.scrollY) window.scrollTo(0, 0); };
+window.addEventListener('scroll', pin, { passive: true }); window.visualViewport?.addEventListener('resize', pin);
+</script>
+</body>
+</html>
